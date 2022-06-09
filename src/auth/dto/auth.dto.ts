@@ -10,4 +10,5 @@ export class CreateUserDto {
   middleName: string;
   email: string;
   password: string;
+  date: string;
 }
