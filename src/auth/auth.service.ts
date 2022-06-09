@@ -6,12 +6,15 @@
 /* eslint-disable prettier/prettier */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User, UserDocument } from 'src/models/user.schema';
 const users = require('../user.json');
-import { AuthDto } from './dto';
+import { AuthDto, CreateUserDto } from './dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>, private jwtService: JwtService) {}
 
   signinLocal(dto: AuthDto) {
     // retrieve user
@@ -22,7 +25,11 @@ export class AuthService {
     return this.signUser(user.id, user.email, 'user');
   }
 
-  signupLocal(dto: AuthDto) {}
+  signupLocal(dto: CreateUserDto): Promise<User> {
+    const { email } = dto;
+    const createUser = new this.userModel(dto);
+    return createUser.save()
+  }
 
   signUser(userId: number, email: string, type: string) {
     return this.jwtService.sign({
@@ -30,5 +37,9 @@ export class AuthService {
       email,
       claim: type,
     });
+  }
+
+  async fetchUsers(): Promise<User[]> {
+    return this.userModel.find({});
   }
 }

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
+import { AuthDto, CreateUserDto } from './dto';
 
 @Controller()
 export class AuthController {
@@ -13,7 +13,12 @@ export class AuthController {
   }
 
   @Post('local/signup')
-  signupLocal(@Body() dto: AuthDto) {
+  signupLocal(@Body() dto: CreateUserDto) {
     return this.authService.signupLocal(dto);
+  }
+
+  @Get('users')
+  getUsers() {
+    return this.authService.fetchUsers();
   }
 }
